@@ -15,6 +15,7 @@ const SmallForecastCard = ({
       sx={{
         backgroundColor: "background.default",
         width: "100%",
+        minHeight: "10vh",
       }}
     >
       <CardContent>

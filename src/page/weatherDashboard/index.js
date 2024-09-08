@@ -86,6 +86,7 @@ const WeatherDashboard = () => {
     },
   ]);
 
+  const [seeMore, setSeeMore] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
   const [submittedCity, setSubmittedCity] = useState("");
@@ -190,7 +191,7 @@ const WeatherDashboard = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  m: 2,
+                  p: 2,
                 }}
               >
                 <Stack direction="column" spacing={2} width="100%">
@@ -232,7 +233,7 @@ const WeatherDashboard = () => {
                     color="secondary"
                     onClick={openDialog}
                   >
-                    Subscribe to Newsletter
+                    Subscribe to Weather Newsletter
                   </Button>
                   <EmailDialog
                     loading={loading}
@@ -252,7 +253,7 @@ const WeatherDashboard = () => {
 
             {/* Current day large card */}
             <Grid item xs={12} md={8}>
-              <Box sx={{ ml: 2 }}>
+              <Box sx={{ m: 2 }}>
                 <Box sx={{ display: "flex", justifyContent: "center" }}>
                   <CurrentForecastCard
                     city={currentWeather.city}
@@ -264,28 +265,42 @@ const WeatherDashboard = () => {
                     condition_icon={currentWeather.condition_icon}
                   />
                 </Box>
-
-                <Typography variant="h6" align="left" sx={{ mt: 3 }}>
-                  4-Day Forecast
-                </Typography>
+                <Toolbar>
+                  <Typography
+                    variant="h6"
+                    align="left"
+                    sx={{ mt: 3, flexGrow: 1 }}
+                  >
+                    {seeMore ? 12 : 4}-Day Forecast
+                  </Typography>
+                  <Button
+                    variant="text"
+                    onClick={() => setSeeMore(!seeMore)}
+                    sx={{ mt: 3 }}
+                  >
+                    {seeMore ? "See Less" : "See More"}
+                  </Button>
+                </Toolbar>
 
                 {/* 4-day forecast section */}
                 <Box sx={{ mt: 3 }}>
                   <Grid container justifyContent={"center"}>
-                    {forecastData.map((forecast, index) => (
-                      <Grid item xs={12} md={3} sx={{ p: 1 }}>
-                        <SmallForecastCard
-                          key={index}
-                          city={forecast.city}
-                          date={convertDayToDate(forecast.day)}
-                          temperature={forecast.temperature}
-                          wind_speed={forecast.wind_speed}
-                          humidity={forecast.humidity}
-                          condition={forecast.condition}
-                          condition_icon={forecast.condition_icon}
-                        />
-                      </Grid>
-                    ))}
+                    {forecastData
+                      .map((forecast, index) => (
+                        <Grid item xs={12} md={3} sx={{ p: 1 }}>
+                          <SmallForecastCard
+                            key={index}
+                            city={forecast.city}
+                            date={convertDayToDate(forecast.day)}
+                            temperature={forecast.temperature}
+                            wind_speed={forecast.wind_speed}
+                            humidity={forecast.humidity}
+                            condition={forecast.condition}
+                            condition_icon={forecast.condition_icon}
+                          />
+                        </Grid>
+                      ))
+                      .slice(0, seeMore ? 12 : 4)}
                   </Grid>
                 </Box>
               </Box>
