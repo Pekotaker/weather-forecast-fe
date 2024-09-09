@@ -16,9 +16,16 @@ import {
   SmallForecastCard,
   CurrentForecastCard,
   EmailDialog,
+  SearchedCityDropdown,
 } from "../../components";
 import { SubscribeService, WeatherService } from "../../api";
 import { DEFAULT_CITY } from "../../config";
+import {
+  helperFunction,
+  getLocationDetail,
+  getLocations,
+  CurrentPublicIPService,
+} from "../../utils";
 
 const convertDayToDate = (dayOffset) => {
   const today = new Date();
@@ -36,6 +43,8 @@ const convertDayToDate = (dayOffset) => {
 
 const WeatherDashboard = () => {
   // Example forecast data (can be replaced with API data)
+
+  const [searchHistory, setSearchHistory] = useState([]);
 
   const [currentWeather, setCurrentWeather] = useState({
     city: null,
@@ -100,6 +109,37 @@ const WeatherDashboard = () => {
     setDialogOpen(false);
   };
 
+  const handleSetSearchHistory = async () => {
+    const locations = await getLocations();
+    if (locations) {
+      setSearchHistory(locations);
+    }
+  };
+
+  const handleSearchHistory = async (city) => {
+    const location = await getLocationDetail(city);
+    console.log(location);
+    if (location) {
+      setCurrentWeather(location.response[0]);
+      setForecastData(location.response.slice(1));
+    }
+  };
+
+  const handleSearch = async (city = null) => {
+    fetchWeatherData(city);
+    if (city) {
+      const locations = await getLocations();
+      if (locations) {
+        if (!locations.includes(city)) {
+          locations.push(city);
+          setSearchHistory(locations);
+        }
+      } else {
+        setSearchHistory([city]);
+      }
+    }
+  };
+
   const handleConfirmEmail = async () => {
     setLoading(true);
     setSubmittedEmail(submittedEmail);
@@ -114,7 +154,7 @@ const WeatherDashboard = () => {
     }
   };
 
-  const fetchWeatherData = async (city = DEFAULT_CITY) => {
+  const fetchWeatherData = async (city = null) => {
     if (city === "" || city === undefined) {
       city = null;
     }
@@ -125,6 +165,7 @@ const WeatherDashboard = () => {
       response = await WeatherService.getCurrentLocationWeather();
     }
     if (response[0] && response[0].city) {
+      await helperFunction(response);
       setCurrentWeather(response[0]);
       setForecastData(response.slice(1));
     } else {
@@ -133,7 +174,8 @@ const WeatherDashboard = () => {
   };
 
   useEffect(() => {
-    fetchWeatherData(DEFAULT_CITY);
+    handleSetSearchHistory();
+    fetchWeatherData();
   }, []);
 
   return (
@@ -208,14 +250,11 @@ const WeatherDashboard = () => {
                     variant="contained"
                     fullWidth
                     onClick={() =>
-                      fetchWeatherData(
-                        document.getElementById("search-city").value
-                      )
+                      handleSearch(document.getElementById("search-city").value)
                     }
                   >
                     Search
                   </Button>
-
                   <Button
                     variant="outlined"
                     fullWidth
@@ -226,6 +265,10 @@ const WeatherDashboard = () => {
                   >
                     Use Current Location
                   </Button>
+                  <SearchedCityDropdown
+                    searchedHistory={searchHistory}
+                    handleSearchHistory={handleSearchHistory}
+                  />
                   <Divider />
                   <Button
                     variant="contained"
