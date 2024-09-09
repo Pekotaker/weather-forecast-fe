@@ -125,17 +125,15 @@ const WeatherDashboard = () => {
     }
   };
 
-  const handleSearch = async (city = null) => {
-    fetchWeatherData(city);
+  const handleSearch = async (city) => {
+    if (city.trim() === "" || city === null || city === undefined) {
+      return;
+    }
+    await fetchWeatherData(city);
     if (city) {
       const locations = await getLocations();
       if (locations) {
-        if (!locations.includes(city)) {
-          locations.push(city);
-          setSearchHistory(locations);
-        }
-      } else {
-        setSearchHistory([city]);
+        setSearchHistory(locations);
       }
     }
   };
