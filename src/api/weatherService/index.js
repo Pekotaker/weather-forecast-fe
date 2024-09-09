@@ -28,29 +28,29 @@ class WeatherService {
     }
   }
 
-  // async getCurrentLocationWeather() {
-  //   try {
-  //     const PublicIP = await CurrentPublicIPService.getCurrentPublicIP();
-  //     const params = {
-  //       city: PublicIP,
-  //     };
-  //     const response = await http.get(`/getWeatherHistory`, { params });
-  //     return response.data;
-  //   } catch (error) {
-  //     console.error("Error while fetching current location weather", error);
-  //     return null;
-  //   }
-  // }
-
   async getCurrentLocationWeather() {
     try {
-      const response = await http.get(`/getCurrentLocationWeather`);
+      const PublicIP = await CurrentPublicIPService.getCurrentPublicIP();
+      const params = {
+        city: PublicIP,
+      };
+      const response = await http.get(`/getWeatherHistory`, { params });
       return response.data;
     } catch (error) {
       console.error("Error while fetching current location weather", error);
       return null;
     }
   }
+
+  // async getCurrentLocationWeather() {
+  //   try {
+  //     const response = await http.get(`/getCurrentLocationWeather`);
+  //     return response.data;
+  //   } catch (error) {
+  //     console.error("Error while fetching current location weather", error);
+  //     return null;
+  //   }
+  // }
 }
 
 export default new WeatherService();
